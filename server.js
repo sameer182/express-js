@@ -48,24 +48,60 @@ const setupMongoDB = async () => {
   // Run the setup when the server starts
   setupMongoDB();
 
-  //GET the lessons
+//GET the lessons 
 app.get('/lessons', async (req,res) => {
   try {
       const result = await lessonsCollection.find().toArray();
       res.json(result);
       } catch (err) {
-        console.error("Error fetchind data from MongoDB: ", err);
+        console.error("Error fetching data from MongoDB: ", err);
         res.status(500).send("Internal Server Error");
       }
 });
 
 //GET the lessons with their id
-app.get('/lessons/:id', (req,res) => {
-    const lessonsId = Number(req.params.id);
+app.get('/lessons/:id', async (req,res) => {
+    try {
+    const lessonsId =  Number(req.params.id);
 
-    const lessons = products.filter((lessons) => lessons.id === lessonsId);
-    res.send(lessons);
+    const lessons = await lessonsCollection.findOne({ id:lessonsId });
+    if (lessons) {
+        res.send(lessons);
+      } else {
+        res.status(400).send("Lesson not found");
+      } 
+    } catch (err) {
+        console.log("Error fetching lessons id from MongoDB: ", err);
+        res.status(500).send("Internal Server Error");
+    }
+});
 
+//Get the orders
+app.get('/orders', async (req,res) => {
+    try{
+        const orders = await ordersCollection.find().toArray();
+        res.json(orders);
+    } catch (err) {
+        console.log("Error fetching orders from MongoDB: ", err);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
+//Get the orders with lessonId
+app.get('/orders/:lessonId', async (req, res) => {
+    try {
+        const lessonId = req.params.lessonId; //stored lessonId as string
+
+        const order = await ordersCollection.findOne({ lessonId: lessonId });
+        if (order) {
+            res.send(order);
+        } else {
+            res.status(400).send("Orders not found");
+        }
+    } catch (err) {
+        console.log("Error fetchind orders id from MongoDB: ", err);
+        res.status(500).send("Internal Server Error");
+    }
 });
 
 //Error message
