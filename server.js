@@ -104,6 +104,28 @@ app.get('/orders/:lessonId', async (req, res) => {
     }
 });
 
+//Post the new orders
+app.post('/submit-order', async (req, res) => {
+   try {
+    //Extract order data from the request body
+    const { name, phoneNumber, lessonId, numberOfSpaces } = req.body;
+
+    //Insert the order into the "orders" collection
+    const result = await ordersCollection.insertOne({
+      name,
+      phoneNumber,
+      lessonId,
+      numberOfSpaces
+    });
+
+    //Respond with the success message
+    res.status(201).json({ message: "Order submitted sucessfully.", orderId: result.insertedId });
+  } catch (err) {
+    console.error("Error submitting order:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 //Error message
 app.use((err, req, res, next) => {
     console.log(err.stack);
