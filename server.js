@@ -126,6 +126,30 @@ app.post('/submit-order', async (req, res) => {
   }
 });
 
+//PUT method for updating the number of availabe space
+app.put('/lessons/:id', async (req,res) => {
+  const lessonId = Number(req.params.id);
+  const { availableInventory } = req.body;
+
+  try{
+    const result = await lessonsCollection.updateOne(
+      { id: lessonId},
+      { $inc: { availableInventory: -1}} //updates the inventory by -1 for each request
+      //Setting the value for invetory
+      // { $set: { availableInventory: 10}}
+    );
+
+    if (result.modifiedCount ==1) {
+      res.json({ message: "Update Successfull"});
+    } else {
+      res.status(404).json({ error: "Lesson not found"});
+    }
+  } catch (err) {
+    console.error("Error updating data in MongoDB Atlas: ", err);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
 //Error message
 app.use((err, req, res, next) => {
     console.log(err.stack);
