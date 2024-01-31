@@ -48,6 +48,19 @@ const setupMongoDB = async () => {
   // Run the setup when the server starts
   setupMongoDB();
 
+//----------------------Setting up paramaeters--------------------//
+
+// Middleware to initialize collection based on collectionName parameter
+app.param('collectionName', async (req, res, next, collectionName) => {
+  try {
+    req.collection = await connectMongoDB(collectionName);
+    return next();
+  } catch (err) {
+    console.error('Error initializing collection:', err);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
 //GET the lessons 
 app.get('/lessons', async (req,res) => {
   try {
