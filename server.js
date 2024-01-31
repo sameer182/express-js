@@ -62,7 +62,7 @@ app.param('collectionName', async (req, res, next, collectionName) => {
 });
 
 //GET the lessons 
-app.get('/lessons', async (req,res) => {
+app.get('/:collectionName', async (req,res) => {
   try {
       const result = await lessonsCollection.find().toArray();
       res.json(result);
@@ -73,7 +73,7 @@ app.get('/lessons', async (req,res) => {
 });
 
 //GET the lessons with their id
-app.get('/lessons/:id', async (req,res) => {
+app.get('/:collectionName/:id', async (req,res) => {
     try {
     const lessonsId =  Number(req.params.id);
 
@@ -166,7 +166,7 @@ app.put('/lessons/:id', async (req,res) => {
 //Error message
 app.use((err, req, res, next) => {
     console.log(err.stack);
-    res.status(500).send("Something is broker.");
+    res.status(500).send("Something is broken.");
 });
 
 app.listen(PORT, () => {
